@@ -20,7 +20,7 @@ const getAllProducts = async (req: Request, res: Response) => {
 
 const newProduct = async (req: Request, res: Response) => {
   try {
-    const { title, price, description, category } = req.params;
+    const { title, price, description, category } = req.body;
     const newProductData: Product = {
       title,
       price: Number(price),
@@ -29,7 +29,7 @@ const newProduct = async (req: Request, res: Response) => {
     };
 
     const product = await insertProduct(newProductData);
-    res.status(200).json({ id: product, ...newProductData });
+    res.status(200).json({ id: product[0], ...newProductData });
   } catch (error: unknown | Error) {
     if (error instanceof Error) {
       console.log(error.message);
