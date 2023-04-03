@@ -1,7 +1,8 @@
 import cors from "cors";
 import * as dotenv from "dotenv";
-import express, { Request, Response, Router } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { router } from "./Routes/router";
+import { errorMiddleware } from "./Middlewares/errorMiddleware";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1", router);
+
+app.use("/", errorMiddleware);
 
 app.use("*", (_req: Request, res: Response) =>
   res.status(404).json({

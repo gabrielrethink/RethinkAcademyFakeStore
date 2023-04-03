@@ -19,7 +19,6 @@ const insertStarterData = async () => {
         1 + allCategoriesPromise.findIndex((item: String) => item === category),
     })
   );
-
   const catories: CategoryFromDb[] = allCategoriesPromise.map((category) => ({
     name: category,
   }));

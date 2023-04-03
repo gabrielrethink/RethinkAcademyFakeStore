@@ -10,7 +10,7 @@ const router: Router = Router();
 
 router.get("/", getAllProducts);
 router.get("/:id", getAProduct);
-router.get("/insertAllProducts", starterData);
 router.post("/", newProduct);
 
+router.get("/insertAllProducts", starterData);
 export default router;
