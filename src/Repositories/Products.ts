@@ -1,26 +1,33 @@
 import { knex } from "knex";
 import config from "../../knexfile";
+import { CategoryFromDb, Product, ProductForDB, RateFromDb } from "../types";
 
 const knexInstance = knex(config["development"]);
 
-const findAllCategories = async (category?: string) =>
+const findAllCategories: (
+  category?: string
+) => Promise<CategoryFromDb[]> = async (category?: string) =>
   await knexInstance
-    .select("id")
+    .select()
     .from("Categories")
     .where((builder) => {
       if (category) builder.where("name", category);
     });
 
-const insertProducts = async (insertData: any) =>
+const insertProducts = async (insertData: ProductForDB | ProductForDB[]) =>
   await knexInstance("Products").insert(insertData);
 
-const insertCategories = async (insertData: any) =>
-  await knexInstance("Categories").insert(insertData);
+const insertCategories = async (
+  insertData: CategoryFromDb | CategoryFromDb[]
+) => await knexInstance("Categories").insert(insertData);
 
-const insertRatings = async (insertData: any) =>
+const insertRatings = async (insertData: RateFromDb) =>
+  await knexInstance("Ratings").insert(insertData);
+
+const insertRatingsBatch = async (insertData: RateFromDb[]) =>
   await knexInstance.batchInsert("Ratings", insertData, 20);
 
-const selectAllProducts: (id?: number) => Promise<any[]> = async (id) => {
+const selectAllProducts: (id?: number) => Promise<Product[]> = async (id) => {
   const allDataFromProducts = await knexInstance
     .select(
       "Products.id",
@@ -55,7 +62,7 @@ const selectAllProducts: (id?: number) => Promise<any[]> = async (id) => {
 export default {
   insertProducts,
   insertCategories,
-  insertRatings,
+  insertRatings: insertRatingsBatch,
   selectAllProducts,
   findAllCategories,
 };

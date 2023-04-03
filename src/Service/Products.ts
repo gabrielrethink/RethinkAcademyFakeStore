@@ -1,16 +1,17 @@
 import repositories from "../Repositories/Products";
+import { CategoryFromDb, Product, ProductForDB } from "../types";
 
 const insertStarterData = async () => {
   const allCategoriesPromise: String[] = await fetch(
     "https://fakestoreapi.com/products/categories"
   ).then((res) => res.json());
 
-  const allProductsPromise: any[] = await fetch(
+  const allProductsPromise: Product[] = await fetch(
     "https://fakestoreapi.com/products"
   ).then((res) => res.json());
 
-  const allProductsFormatedData = allProductsPromise.map(
-    ({ title, price, description, category }: any) => ({
+  const allProductsFormatedData: ProductForDB[] = allProductsPromise.map(
+    ({ title, price, description, category }) => ({
       title,
       price,
       description,
@@ -19,19 +20,26 @@ const insertStarterData = async () => {
     })
   );
 
-  repositories.insertCategories(
-    allCategoriesPromise.map((category: any) => ({
-      name: category,
-    }))
-  );
+  const catories: CategoryFromDb[] = allCategoriesPromise.map((category) => ({
+    name: category,
+  }));
+  repositories.insertCategories(catories);
   repositories.insertProducts(allProductsFormatedData);
   repositories.insertRatings(makeRatings());
 };
-const insertProduct = async (newProductData: any) => {
+
+const insertProduct = async (newProductData: Product) => {
   const { category, ...data } = newProductData;
 
-  const categoryId = repositories.findAllCategories(category);
-  return repositories.insertProducts({ ...data, category_id: categoryId });
+  const categoryId = await repositories.findAllCategories(category);
+  if (!categoryId[0].id) {
+    throw new Error("Category not Found");
+  }
+
+  return repositories.insertProducts({
+    ...data,
+    category_id: categoryId[0].id,
+  });
 };
 
 const makeRatings = () => {

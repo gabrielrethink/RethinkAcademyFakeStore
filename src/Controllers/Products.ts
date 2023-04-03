@@ -5,6 +5,7 @@ import {
   selectAProduct,
   insertProduct,
 } from "../Service/Products";
+import { Product } from "../types";
 
 const getAllProducts = async (req: Request, res: Response) => {
   try {
@@ -19,7 +20,13 @@ const getAllProducts = async (req: Request, res: Response) => {
 
 const newProduct = async (req: Request, res: Response) => {
   try {
-    const newProductData = req.params;
+    const { title, price, description, category } = req.params;
+    const newProductData: Product = {
+      title,
+      price: Number(price),
+      description,
+      category,
+    };
 
     const product = await insertProduct(newProductData);
     res.status(200).json({ id: product, ...newProductData });
@@ -34,7 +41,7 @@ const getAProduct = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     if (typeof id === "number") {
-      const product: any[] = await selectAProduct(id);
+      const product: Product[] = await selectAProduct(id);
       res.status(200).json(product[0]);
     } else {
       throw new Error("ID is not a number");
